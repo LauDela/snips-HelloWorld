@@ -31,9 +31,20 @@ def subscribe_intent_callback(hermes, intentMessage):
 def action_wrapper(hermes, intentMessage, conf):
     current_session_id = intentMessage.session_id
     hermes.publish_end_session(current_session_id, "Bonjour, comment vas tu ? Moi, très bien merci")
+    
+def subscribe_intent_callback_bonjour(hermes, intentMessage):
+    conf = read_configuration_file(CONFIG_INI)
+    action_wrapper_bonjour(hermes, intentMessage, conf)
+
+def action_wrapper_bonjour(hermes, intentMessage, conf):
+    current_session_id = intentMessage.session_id
+    hermes.publish_end_session(current_session_id, "Bonjour à toi, oh mon maitre")    
 
 
 if __name__ == "__main__":
     mqtt_opts = MqttOptions()
     with Hermes(mqtt_options=mqtt_opts) as h:
-        h.subscribe_intent("LauDela:hello", subscribe_intent_callback).start()
+        h.subscribe_intent("LauDela:hello", subscribe_intent_callback) \
+         .subscribe_intent("LauDela:bonjour2", subscribe_intent_callback_bonjour) \
+        
+        .start()
