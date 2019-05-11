@@ -3,6 +3,7 @@
 
 import configparser
 from hermes_python.hermes import Hermes
+from hermes_python.ffi.utils import MqttOptions
 from hermes_python.ontology import *
 import io
 
@@ -20,13 +21,12 @@ def read_configuration_file(configuration_file):
             conf_parser = SnipsConfigParser()
             conf_parser.readfp(f)
             return conf_parser.to_dict()
-    except (IOError, ConfigParser.Error) as e:
+    except (IOError, configparser.Error) as e:
         return dict()
 
 def subscribe_intent_callback(hermes, intentMessage):
     conf = read_configuration_file(CONFIG_INI)
     action_wrapper(hermes, intentMessage, conf)
-
 
 def action_wrapper(hermes, intentMessage, conf):
     current_session_id = intentMessage.session_id
@@ -34,6 +34,7 @@ def action_wrapper(hermes, intentMessage, conf):
 
 
 if __name__ == "__main__":
-    with Hermes("localhost:1883") as h:
-        h.subscribe_intent("CrystalMethod:hello", subscribe_intent_callback) \
+    mqtt_opts = MqttOptions()
+    with Hermes(mqtt_options=mqtt_opts) as h:
+        h.subscribe_intent("{hello}", subscribe_intent_callback) \
          .start()
